@@ -1,0 +1,64 @@
+{#
+# This file is part of MedShakeST.
+#
+# Copyright (c) 2022
+# Bertrand Boutillier <b.boutillier@gmail.com>
+# http://www.medshake.net
+#
+# MedShakeST is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# MedShakeST is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with MedShakeST. If not, see <http://www.gnu.org/licenses/>.
+#/
+
+/##
+ # Template > listing entreprises
+ #
+ # @author Bertrand Boutillier <b.boutillier@gmail.com>
+ #}
+
+<div class="my-4 d-flex justify-content-between">
+<p class="lead fw-bold">Cliquez sur les titres de colonne pour trier. Utilisez ctrl + F pour chercher.</p>
+<button class="btn btn-primary btn-sm" onclick="exportTableToCSV('#tableEntreprises','entreprises.csv')"><i class="fa-solid fa-file-export"></i> Exporter en CSV</button>
+</div>
+
+<table id="tableEntreprises" class="table table-sm table-hover">
+    <thead>
+        <tr>
+            <th role="button" data-sort="int">#</th>
+            <th role="button" data-sort="string">ID</th>
+            <th role="button" data-sort="string">Nom</th>
+            <th role="button" data-sort="int" data-sort-onload="yes" data-sort-default="desc">Effectif</th>
+            <th role="button" data-sort="string">NAF</th>
+            <th role="button" data-sort="float">IF AT {{dernieresDataAmeliAT}}</th>
+            <th role="button" data-sort="float">TF AT {{dernieresDataAmeliAT}}</th>
+            <th role="button" data-sort="float">TG AT {{dernieresDataAmeliAT}}</th>
+            <th role="button" data-sort="float">IG AT {{dernieresDataAmeliAT}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entreprise in page.listingCSV %}
+        <tr>
+            <td data-sort-value="{{ loop.index }}">#{{ loop.index }}</td>
+            <td>{{ entreprise[0] }}</td>
+            <td>{{ entreprise.3 }}</td>
+            <td>{{ entreprise.2 }}</td>
+            <td><a href="javascript:void(0)" class="nafredirector link-dark link-underline-opacity-25" data-sousclasse="{{ entreprise.1|replace({'.': ''}) }}">{{ entreprise.1 }}</a></td>
+            <td data-sort-value="{{ page.hierarchieNAF.sousclasses[entreprise.1].indicateurIF }}">{{ page.hierarchieNAF.sousclasses[entreprise.1].indicateurIF|format_number({fraction_digit: 2}) }}</td>
+            <td data-sort-value="{{ page.hierarchieNAF.sousclasses[entreprise.1].indicateurTF }}">{{ page.hierarchieNAF.sousclasses[entreprise.1].indicateurTF|format_number({fraction_digit: 2}) }}</td>
+            <td data-sort-value="{{ page.hierarchieNAF.sousclasses[entreprise.1].indicateurTG }}">{{ page.hierarchieNAF.sousclasses[entreprise.1].indicateurTG|format_number({fraction_digit: 2}) }}</td>
+            <td data-sort-value="{{ page.hierarchieNAF.sousclasses[entreprise.1].indicateurIG }}">{{ page.hierarchieNAF.sousclasses[entreprise.1].indicateurIG|format_number({fraction_digit: 2}) }}</td>
+
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,79 @@
+{#
+# This file is part of MedShakeST.
+#
+# Copyright (c) 2022
+# Bertrand Boutillier <b.boutillier@gmail.com>
+# http://www.medshake.net
+#
+# MedShakeST is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# MedShakeST is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with MedShakeST. If not, see <http://www.gnu.org/licenses/>.
+#/
+
+/##
+ # Template > page web racine
+ #
+ # @author Bertrand Boutillier <b.boutillier@gmail.com>
+ #}
+
+<!doctype html>
+<html class="h-100" lang="fr">
+	<head {% if page.ogHead %} {{ page.ogHead }} {% endif %}>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>
+			{% block title %}{% endblock %}
+		</title>
+		<meta name="Description" content="{% block metaDescription %}{% endblock %}"/>
+		<base
+		href="{{ config.protocol }}{{ config.host }}{{ config.urlHostSuffixe }}"/>
+
+		{# css #}
+		{% block cssFiles %}
+			<link type="text/css" href="{{ config.protocol }}{{ config.host }}{{ config.urlHostSuffixe }}/vendor/fortawesome/font-awesome/css/all.min.css" rel="stylesheet">
+			<link type="text/css" href="{{ config.protocol }}{{ config.host }}{{ config.urlHostSuffixe }}/vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
+		{% endblock %}
+
+		{# js #}
+		{% block jsFiles %}
+			<script type="text/javascript" src="{{ config.protocol }}{{ config.host }}{{ config.urlHostSuffixe }}/vendor/jquery/jquery/dist/jquery.min.js?{{ modules.base }}"></script>
+			<script type="text/javascript" src="{{ config.protocol }}{{ config.host }}{{ config.urlHostSuffixe }}/vendor/twbs/bootstrap/dist/js/bootstrap.min.js?{{ modules.base }}"></script>
+			<script type="text/javascript" src="{{ config.protocol }}{{ config.host }}{{ config.urlHostSuffixe }}/vendor/danielm/uploader/src/js/jquery.dm-uploader.js?{{ modules.base }}"></script>
+		{% endblock %}
+
+		{% block head %}{% endblock %}
+        
+        <script>
+            var urlBase = '{{ config.protocol }}{{ config.host }}{{ config.urlHostSuffixe }}';
+            {% block jsEmbed %}
+            {% endblock %}
+        </script>
+	</head>
+
+	<body class="d-flex flex-column h-100" {% block bodyTagAdd %} {% endblock %}>
+        <main class="flex-shrink-0">
+
+		<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+			<div class="container-fluid">
+				        <a class="navbar-brand font-weight-bold" href="/"><img src="/img/medshake-logoblanc.svg" class="h-100" alt="logo medshake" style="width: 50px;"/>
+          MedShakeST
+        </a>
+			</div>
+		</nav>
+
+		{% block body %}{% endblock %}
+        </main>
+
+	</body>
+    <footer class="footer mt-auto py-3 bg-light small text-secondary text-center">Hébergé par <a class="link-secondary" href="http://www.medshake.net">MedShake.net</a> - Réalisé sous licence AGPL -  ©2022 Bertrand Boutillier</footer>
+</html>

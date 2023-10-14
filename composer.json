@@ -1,0 +1,7 @@
+{
+    "require": {
+        "twig/twig": "^3.4",
+        "altorouter/altorouter": "^2.0",
+        "twig/intl-extra": "^3.4"
+    }
+}

@@ -1,0 +1,181 @@
+{#
+# This file is part of MedShakeST.
+#
+# Copyright (c) 2022
+# Bertrand Boutillier <b.boutillier@gmail.com>
+# http://www.medshake.net
+#
+# MedShakeST is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# MedShakeST is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with MedShakeST. If not, see <http://www.gnu.org/licenses/>.
+#/
+
+/##
+ # Template > résultats d'analyse du CSV
+ #
+ # @author Bertrand Boutillier <b.boutillier@gmail.com>
+ #}
+
+{% extends "page.html.twig" %}
+{% set dernieresDataAmeliAT = config['dernieresDataAmeliAT'] %}
+{% set dernieresDataAmeliMP = config['dernieresDataAmeliMP'] %}
+{% set dernieresDataAmeliT = config['dernieresDataAmeliT'] %}
+{% set indicateursAT = {'indicateurIF':'Indice de fréquence', 'indicateurTF':'Taux de fréquence', 'indicateurTG':'Taux de gravité', 'indicateurIG':'Indice de gravité'} %}
+
+{% block title %}MedShakeST : résultats d'analyse
+{% endblock %}
+
+{% block cssFiles %}
+    {{ parent() }}
+{% endblock %}
+
+{% block jsFiles %}
+    {{ parent() }}
+	<script type="text/javascript" src="{{ config.protocol }}{{ config.host }}{{ config.urlHostSuffixe }}/vendor/joequery/stupid-table-plugin/stupidtable.min.js?{{ modules.base }}"></script>
+
+{% endblock %}
+
+{% block jsEmbed %}
+	{{ parent() }}
+    window.onbeforeunload = function(){
+        return confirm('Attention, si vous quittez la page, vous devrez charger à nouveau votre fichier CSV');
+    }
+
+    /**
+    * Make csv file from html table
+    * Thanks to codexworld <https://www.codexworld.com/export-html-table-data-to-csv-using-javascript/>
+    * @param  {string} table    table selector
+    * @param  {string} filename filename
+    * @return {file}          file
+    */
+    function exportTableToCSV(table, filename) {
+        var csv = [];
+        var rows = document.querySelectorAll(table + " tr");
+
+        for (var i = 0; i < rows.length; i++) {
+            var row = [],
+            cols = rows[i].querySelectorAll("td, th");
+
+            for (var j = 0; j < cols.length; j++)
+            row.push(cols[j].innerText);
+
+            csv.push(row.join(";"));
+        }
+
+        // Download CSV file
+        downloadCSV(csv.join("\n"), filename);
+    }
+
+    /**
+    * download csv file
+    * Thanks to codexworld <https://www.codexworld.com/export-html-table-data-to-csv-using-javascript/>
+    */
+    function downloadCSV(csv, filename) {
+        var csvFile;
+        var downloadLink;
+
+        // CSV file
+        csvFile = new Blob([csv], {
+            type: "text/csv"
+        });
+
+        // Download link
+        downloadLink = document.createElement("a");
+
+        // File name
+        downloadLink.download = filename;
+
+        // Create a link to the file
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+
+        // Hide download link
+        downloadLink.style.display = "none";
+
+        // Add the link to DOM
+        document.body.appendChild(downloadLink);
+
+        // Click download link
+        downloadLink.click();
+    }
+
+    $(document).ready(function() {
+        
+        var table = $("#tableEntreprises").stupidtable();
+        table.bind('aftertablesort', function (event, data) {
+            th = $(this).find("th");
+            th.find(".arrow").remove();
+            dir = $.fn.stupidtable.dir;
+            arrow = data.direction === dir.ASC ? "fa-chevron-up" : "fa-chevron-down";
+
+            th.eq(data.column).append('<span class="ms-1 arrow fa ' + arrow + '"></span>');
+        });
+
+        $('.nafredirector').on('click', function() {
+            const sousclasse = $(this).data('sousclasse');
+            const classe = $(this).data('sousclasse').substring(0, 4);
+            const buttonparents = $('#heading' + classe).parents('div.accordion-collapse');
+            boutons = buttonparents.prev('h2').contents('button').toArray().reverse();
+            $('#browse-tab').trigger('click');
+            $(boutons).each(function(index, element) {
+                $(element).click();
+            });
+            $('button[data-bs-target="#collapse' + classe + '"]').click();
+            setTimeout(function() {
+                $('html, body').animate({
+                    scrollTop: $('#sousClasse' + sousclasse ).offset().top
+                }, 1);
+            }, 500);
+
+        });
+
+    });
+{% endblock %}
+
+{% block body %}
+	{{ parent() }}
+
+	<main class="container-fluid">
+
+		<h1 class="fs-2">Résultats d'analyse</h1>
+
+        <div class="my-3 p-3 d-flex justify-content-center lead bg-light">
+            <span class="mx-3"><i class="fa-solid fa-industry text-secondary"></i> {{ page.stats.CSV.totalEntreprises|format_number }} entreprises</span>
+
+            {% if page.stats.CSV.totalSalaries > 0 %}
+                <span class="mx-3">
+                    <i class="fa-solid fa-user text-secondary"></i> {{ page.stats.CSV.totalSalaries|format_number }} salariés
+                </span>
+            {% endif %}
+
+            <span class="mx-3"><i class="fa-solid fa-bars-staggered text-secondary"></i> {{ page.stats.CSV.NAFtotaux.sousclasses|format_number }} codes NAF</span>
+
+        </div>
+
+		<ul class="nav nav-tabs fw-bold mt-3" id="myTab" role="tablist">
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats-tab-pane" type="button" role="tab" aria-controls="stats-tab-pane" aria-selected="true"><i class="fa-solid fa-chart-bar"></i> Statistiques</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link active" id="browse-tab" data-bs-toggle="tab" data-bs-target="#browse-tab-pane" type="button" role="tab" aria-controls="browse-tab-pane" aria-selected="false"><i class="fa-solid fa-bars-staggered"></i> NAF</button>
+			</li>
+            <li class="nav-item" role="presentation">
+				<button class="nav-link" id="listing-tab" data-bs-toggle="tab" data-bs-target="#listing-tab-pane" type="button" role="tab" aria-controls="listing-tab-pane" aria-selected="false"><i class="fa-solid fa-list-ol"></i> Listing</button>
+			</li>
+		</ul>
+		<div class="tab-content" id="myTabContent">
+			<div class="tab-pane fade" id="stats-tab-pane" role="tabpanel" aria-labelledby="stats-tab" tabindex="0">{% include('tab-stats.html.twig') %}</div>
+			<div class="tab-pane fade show active" id="browse-tab-pane" role="tabpanel" aria-labelledby="browse-tab" tabindex="0">{% include('tab-browseAnalysesByNAF.html.twig') %}</div>
+            <div class="tab-pane fade" id="listing-tab-pane" role="tabpanel" aria-labelledby="listing-tab" tabindex="0">{% include('tab-listingEntreprises.html.twig') %}</div>
+		</div>
+	</main>
+
+{% endblock %}

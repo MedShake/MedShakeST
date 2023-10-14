@@ -1,0 +1,190 @@
+{#
+# This file is part of MedShakeST.
+#
+# Copyright (c) 2022
+# Bertrand Boutillier <b.boutillier@gmail.com>
+# http://www.medshake.net
+#
+# MedShakeST is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# MedShakeST is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with MedShakeST. If not, see <http://www.gnu.org/licenses/>.
+#/
+
+/##
+ # Template > classement dans NAF
+ #
+ # @author Bertrand Boutillier <b.boutillier@gmail.com>
+ #}
+
+<div class="row small mb-4">
+	<div class="col-12 col-xl-6">
+        <div class="card">
+            <div class="card-header fw-bold">
+                Vos entreprises
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for entrepriseData in ssclasseData.entreprises %}
+                    <li class="list-group-item d-flex justify-content-between list-group-item-action">
+                        <span>{{ entrepriseData.entrepriseID }} {{ entrepriseData.entrepriseNom }}</span>
+                        {% if page.stats.CSV.totalSalaries > 0 %}<span>{{ entrepriseData.Effectif|format_number }} <i class="fa-solid fa-user text-secondary"></i></span>{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+	</div>
+	<div class="col-12 col-xl-6 mt-2 mt-xl-0">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span class="fw-bold">Données sectorielles et sinistralité {{ config.dernieresDataAmeliAT }}</span>
+                <span>
+                <a class="" title="Rechercher les données de sinistralité sur ameli.fr" href="https://assurance-maladie.ameli.fr/etudes-et-donnees/par-theme/risques-professionnels-et-sinistralite/moteur-recherche-code-ape-naf/recherche-fiches-sinistralite-par-code-naf?field_ape_naf_code={{ ssclasseData.codeameli }}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                </span>
+
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-evenly">
+                    <span>
+                        <i class="fa-solid fa-user text-secondary"></i>
+                        {{ page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].NbSalariesEnActiviteOuChoPar|format_number }}
+                        salariés</span>
+                    <span>
+                        <i class="fa-solid fa-industry text-secondary"></i>
+                        {{ page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].nbSiret|format_number }}
+                        établissements</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>
+                        <i class="fa-solid fa-pills text-secondary"></i>
+                        {{ page.ameli.MP[ssclasseData.codeameli][dernieresDataAmeliMP].MP1erReg|format_number }}
+                        maladies profesionnelles
+                        {% if page.ameli.MP[ssclasseData.codeameli][dernieresDataAmeliMP].deces > 0 %} - {{ page.ameli.MP[ssclasseData.codeameli][dernieresDataAmeliMP].deces|format_number }}&nbsp;<i class="fa-solid fa-cross  text-secondary"></i>{% endif%}
+                    </span>
+                    <span>
+                        <i class="fa-solid fa-person-falling-burst text-secondary"></i>
+                        {{ page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].AT1erReg|format_number }}
+                        accidents du travail
+                        {% if page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].deces > 0 %} - {{ page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].deces|format_number }}&nbsp;<i class="fa-solid fa-cross  text-secondary"></i>{% endif%}
+                    </span>
+                    <span>
+                        <i class="fa-solid fa-car-burst text-secondary"></i>
+                        {{ page.ameli.T[ssclasseData.codeameli][dernieresDataAmeliT].AT1erReg|format_number }}
+                        accidents de trajet
+                        {% if page.ameli.T[ssclasseData.codeameli][dernieresDataAmeliT].deces > 0 %} - {{ page.ameli.T[ssclasseData.codeameli][dernieresDataAmeliT].deces|format_number }}&nbsp;<i class="fa-solid fa-cross  text-secondary"></i>{% endif%}
+                    
+                    </span>
+                </li>
+                <li class="list-group-item">
+
+                    <ul class="nav nav-pills my-3" id="detailsAmelie{{ ssclasseData.code|replace({'.': ''}) }}" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="AT{{ ssclasseData.code|replace({'.': ''}) }}-pill" data-bs-toggle="pill" data-bs-target="#AT{{ ssclasseData.code|replace({'.': ''}) }}-tab" type="button" role="tab" aria-controls="AT{{ ssclasseData.code|replace({'.': ''}) }}-pill" aria-selected="true">Détails AT {{ config.dernieresDataAmeliAT }}</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="MP{{ ssclasseData.code|replace({'.': ''}) }}-pill" data-bs-toggle="pill" data-bs-target="#MP{{ ssclasseData.code|replace({'.': ''}) }}-tab" type="button" role="tab" aria-controls="MP{{ ssclasseData.code|replace({'.': ''}) }}-pill" aria-selected="true">Détails MP {{ config.dernieresDataAmeliMP }}</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="detailsAmelie{{ ssclasseData.code|replace({'.': ''}) }}-tabs">
+                        <div class="tab-pane fade show active" id="AT{{ ssclasseData.code|replace({'.': ''}) }}-tab" role="tabpanel" aria-labelledby="AT{{ ssclasseData.code|replace({'.': ''}) }}-pill" tabindex="0">
+                            <div class="row">
+                                <div class="col">
+                                    <table class="table table-hover table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Risque à l'origine</th>
+                                                <th class="text-end">Nombre</th>
+                                                <th class="text-end">%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for key, nombre in page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT]|sort((a, b) => a < b) %}
+                                                {% set tabRisques = ['manutentionManuelle', 'chutesPlainPied', 'outillageMain', 'risqueMachine', 'chutesHauteur','agressions', 'manutentionMecanique', 'risquePhysiqueDontRisqueElec','risqueChimique','risqueRoutier','autresRisques'] %}
+                                                {% if key in tabRisques and nombre > 0 %}
+                                                <tr>
+                                                    <td>
+                                                    {% if key == 'manutentionManuelle' %}Manutention manuelle
+                                                    {% elseif key == 'chutesPlainPied' %}Chute de plain-pied
+                                                    {% elseif key == 'outillageMain' %}Outillage à main
+                                                    {% elseif key == 'risqueMachine' %}Risque machines
+                                                    {% elseif key == 'chutesHauteur' %}Chute de hauteur
+                                                    {% elseif key == 'agressions' %}Agressions (y compris par animaux)
+                                                    {% elseif key == 'manutentionMecanique' %}Manutention mécanique
+                                                    {% elseif key == 'risquePhysiqueDontRisqueElec' %}Risque physique dont risque électrique
+                                                    {% elseif key == 'risqueChimique' %}Risque chimique
+                                                    {% elseif key == 'risqueRoutier' %}Risque routier
+                                                    {% elseif key == 'autresRisques' %}Autres risques
+                                                    {% endif %}    
+                                                    </td>
+                                                    <td class="text-end">
+                                                        {{ nombre|format_number }}
+                                                    </td>
+                                                    <td class="text-end">
+                                                        {{ (nombre / page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].AT1erReg * 100)|format_number({fraction_digit: 1}) }}
+                                                    </td>
+                                                </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col">
+                                    <table class="table table-hover table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Indicateurs</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for indicateur, indicateurLabel in indicateursAT %}
+                                        <tr>
+                                            <td>{{ indicateurLabel }}</td>
+                                            <td class="text-end">{{ page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT][indicateur]|format_number({fraction_digit: 2}) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="MP{{ ssclasseData.code|replace({'.': ''}) }}-tab" role="tabpanel" aria-labelledby="MP{{ ssclasseData.code|replace({'.': ''}) }}-pill" tabindex="0">
+                            <table class="table table-hover table-sm mb-0">
+                            <caption class="small text-end me-1">Affichage des 10 premières catégories</caption>
+                            <thead>
+                            <tr><th class="text-end">Nombre</th><th class="text-end">%</th><th colspan="2">Tableau</th></tr>
+                            </thead>
+                            {% for mpliste in page.ameli.MP[ssclasseData.codeameli][dernieresDataAmeliMP].mpliste|slice(0, 10) %}
+                                {% if mpliste.nb > 0 %}
+                                <tr>
+                                    <td class="text-end">
+                                        {{ mpliste.nb|format_number }}
+                                    </td>
+                                    <td class="text-end">
+                                        {{ (mpliste.nb / page.ameli.MP[ssclasseData.codeameli][dernieresDataAmeliMP].MP1erReg * 100)|format_number({fraction_digit: 1}) }}
+                                    </td>
+                                    <td class="text-end">
+                                        {{ mpliste.MP }}</td><td>{{ mpliste.MPlabel }} 
+                                    </td>
+                                </tr>{% endif %}
+                            {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+
+		
+
+                </li>
+            </ul>
+        </div>
+
+	</div>
+</div>

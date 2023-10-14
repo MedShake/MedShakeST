@@ -1,0 +1,6 @@
+# url rewriting
+# s'assurer que la valeur de AllowOverride du virtualhost permet bien la prise
+# en compte des règles ci-dessous
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule . index.php [L]

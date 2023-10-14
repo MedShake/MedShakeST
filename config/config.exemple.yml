@@ -1,0 +1,17 @@
+protocol: https://
+host: medshakest.local
+urlHostSuffixe: ""
+webDirectory: /home/medshakest/public_html/
+stockageLocation: /home/medshakest/stockage/
+sqlServeur: localhost
+sqlBase: medshakest
+sqlUser: medshakest  
+sqlPass: medshakestPassword
+templatesFolder: /home/medshakest/templates/
+twigEnvironnementCache: false
+twigEnvironnementAutoescape: false
+twigDebug: false
+
+dernieresDataAmeliAT: 2021
+dernieresDataAmeliMP: 2021
+dernieresDataAmeliT: 2021

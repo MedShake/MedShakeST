@@ -1,0 +1,136 @@
+{#
+# This file is part of MedShakeST.
+#
+# Copyright (c) 2022
+# Bertrand Boutillier <b.boutillier@gmail.com>
+# http://www.medshake.net
+#
+# MedShakeST is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# MedShakeST is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with MedShakeST. If not, see <http://www.gnu.org/licenses/>.
+#/
+
+/##
+ # Template > include pour tab parcourir par arborescence NAF
+ #
+ # @author Bertrand Boutillier <b.boutillier@gmail.com>
+ #}
+
+
+
+
+{# Sections #}
+<div class="accordion my-3" id="accordionSection">
+    {% for sectionData in page.hierarchieNAF.sections %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ sectionData.code }}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ sectionData.code }}" aria-expanded="true" aria-controls="collapse{{ sectionData.code }}">
+                    <span class="fw-bold">{{ sectionData.code }}
+                        -
+                        {{ sectionData.label }}
+                    </span>
+                    <span class="ms-3 small">{{ sectionData.nbEntreprises|format_number }} <i class="fa-solid fa-industry text-secondary"></i></span>
+                    {% if page.stats.CSV.totalSalaries > 0 %}<span class="ms-2 small">{{ sectionData.nbSalaries|format_number }} <i class="fa-solid fa-user text-secondary"></i></span>{% endif %}
+                </button>
+            </h2>
+            <div id="collapse{{ sectionData.code }}" class="accordion-collapse collapse" aria-labelledby="heading{{ sectionData.code }}" data-bs-parent="#accordionSection">
+                <div class="accordion-body">
+
+                    {# Divisions #}
+                    <div class="accordion" id="accordionDivisions{{ sectionData.code }}">
+                        {% for divisionData in sectionData.divisions %}
+                            {% set divisionData = page.hierarchieNAF.divisions[divisionData] %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading{{ divisionData.code }}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ divisionData.code }}" aria-expanded="true" aria-controls="collapse{{ divisionData.code }}">
+                                        {{ divisionData.code }}
+                                        -
+                                        {{ divisionData.label }}
+                                        <span class="ms-3 small">{{ divisionData.nbEntreprises|format_number }} <i class="fa-solid fa-industry text-secondary"></i></span>
+                                        {% if page.stats.CSV.totalSalaries > 0 %}<span class="ms-2 small">{{ divisionData.nbSalaries|format_number }} <i class="fa-solid fa-user text-secondary"></i></span>{% endif %}
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ divisionData.code }}" class="accordion-collapse collapse" aria-labelledby="heading{{ divisionData.code }}" data-bs-parent="#accordionDivisions{{ sectionData.code }}">
+                                    <div class="accordion-body">
+
+                                        {# Groupes #}
+                                        <div class="accordion" id="accordionGroupes{{ divisionData.code }}">
+                                            {% for groupeData in divisionData.groupes %}
+                                                {% set groupeData = page.hierarchieNAF.groupes[groupeData] %}
+                                                <div class="accordion-item">
+                                                    <h2 class="accordion-header" id="heading{{ groupeData.code|replace({'.': ''}) }}">
+                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ groupeData.code|replace({'.': ''}) }}" aria-expanded="true" aria-controls="collapse{{ groupeData.code|replace({'.': ''}) }}">
+                                                            {{ groupeData.code }}
+                                                            -
+                                                            {{ groupeData.label }}
+                                                            <span class="ms-3 small">{{ groupeData.nbEntreprises|format_number }} <i class="fa-solid fa-industry text-secondary"></i></span>
+                                                            {% if page.stats.CSV.totalSalaries > 0 %}<span class="ms-2 small">{{ groupeData.nbSalaries|format_number }} <i class="fa-solid fa-user text-secondary"></i></span>{% endif %}
+                                                            
+                                                        </button>
+                                                    </h2>
+                                                    <div id="collapse{{ groupeData.code|replace({'.': ''}) }}" class="accordion-collapse collapse" aria-labelledby="heading{{ groupeData.code|replace({'.': ''}) }}" data-bs-parent="#accordionGroupes{{ divisionData.code }}">
+                                                        <div class="accordion-body">
+    
+                                                            {# Classes et sous classes  #}
+                                                            <div class="accordion" id="accordionClasse{{ groupeData.code|replace({'.': ''}) }}">
+                                                                {% for classeData in groupeData.classes %}
+                                                                    {% set classeData = page.hierarchieNAF.classes[classeData] %}
+                                                                    <div class="accordion-item">
+                                                                        <h2 class="accordion-header" id="heading{{ classeData.code|replace({'.': ''}) }}">
+                                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ classeData.code|replace({'.': ''}) }}" aria-expanded="true" aria-controls="collapse{{ classeData.code|replace({'.': ''}) }}">
+                                                                                {{ classeData.code }} - {{ classeData.label }} 
+                                                                                <span class="ms-3 small">{{ classeData.nbEntreprises|format_number }} <i class="fa-solid fa-industry text-secondary"></i></span>
+                                                                                {% if page.stats.CSV.totalSalaries > 0 %}<span class="ms-2 small">{{ classeData.nbSalaries|format_number }} <i class="fa-solid fa-user text-secondary"></i></span>{% endif %}
+                                                                                                
+                                                                            </button>
+                                                                        </h2>
+                                                                        <div id="collapse{{ classeData.code|replace({'.': ''}) }}" class="accordion-collapse collapse" aria-labelledby="heading{{ classeData.code|replace({'.': ''}) }}" data-bs-parent="#accordionClasse{{ groupeData.code|replace({'.': ''}) }}">
+                                                                            <div class="accordion-body">
+                                                                            
+                                                                                {% for ssclasseData in classeData.sousclasses %}
+                                                                                    {% set ssclasseData = page.hierarchieNAF.sousclasses[ssclasseData] %}
+                                                                                    <div id="sousClasse{{ ssclasseData.code|replace({'.': ''}) }}" class="p-3 mt-1 mb-3 rounded-2 text-primary bg-primary bg-opacity-10" >
+                                                                                        {{ ssclasseData.code }} - 
+                                                                                        {{ ssclasseData.label }} 
+                                                                                        <span class="ms-3 small">{{ ssclasseData.nbEntreprises|format_number }} <i class="fa-solid fa-industry text-secondary"></i></span>
+                                                                                        {% if page.stats.CSV.totalSalaries > 0 %}<span class="ms-2 small">{{ ssclasseData.nbSalaries|format_number }} <i class="fa-solid fa-user text-secondary"></i></span>{% endif %}
+                                                                                    </div>
+                                                                                
+                                                                                    {% include 'inc-NAFsousclasseDetails.html.twig' %}
+                                                                                {% endfor %}
+
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                                
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+
+
+
