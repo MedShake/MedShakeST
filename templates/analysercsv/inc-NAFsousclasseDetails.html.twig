@@ -59,20 +59,20 @@
                     <span>
                         <i class="fa-solid fa-industry text-secondary"></i>
                         {{ page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].nbSiret|format_number }}
-                        établissements</span>
+                        établissements<sup> <a class="link-secondary" href="/analyser/csv/{{ page.CSVid }}/#note1">1</a></sup></span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
-                    <span>
-                        <i class="fa-solid fa-pills text-secondary"></i>
-                        {{ page.ameli.MP[ssclasseData.codeameli][dernieresDataAmeliMP].MP1erReg|format_number }}
-                        maladies profesionnelles
-                        {% if page.ameli.MP[ssclasseData.codeameli][dernieresDataAmeliMP].deces > 0 %} - {{ page.ameli.MP[ssclasseData.codeameli][dernieresDataAmeliMP].deces|format_number }}&nbsp;<i class="fa-solid fa-cross  text-secondary"></i>{% endif%}
-                    </span>
                     <span>
                         <i class="fa-solid fa-person-falling-burst text-secondary"></i>
                         {{ page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].AT1erReg|format_number }}
                         accidents du travail
                         {% if page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].deces > 0 %} - {{ page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].deces|format_number }}&nbsp;<i class="fa-solid fa-cross  text-secondary"></i>{% endif%}
+                    </span>
+                    <span>
+                        <i class="fa-solid fa-pills text-secondary"></i>
+                        {{ page.ameli.MP[ssclasseData.codeameli][dernieresDataAmeliMP].MP1erReg|format_number }}
+                        maladies profesionnelles
+                        {% if page.ameli.MP[ssclasseData.codeameli][dernieresDataAmeliMP].deces > 0 %} - {{ page.ameli.MP[ssclasseData.codeameli][dernieresDataAmeliMP].deces|format_number }}&nbsp;<i class="fa-solid fa-cross  text-secondary"></i>{% endif%}
                     </span>
                     <span>
                         <i class="fa-solid fa-car-burst text-secondary"></i>
@@ -102,7 +102,7 @@
                                             <tr>
                                                 <th>Risque à l'origine</th>
                                                 <th class="text-end">Nombre</th>
-                                                <th class="text-end">%</th>
+                                                <th class="text-end">%<sup> <a class="link-secondary" href="/analyser/csv/{{ page.CSVid }}/#note2">2</a></sup></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -128,7 +128,7 @@
                                                         {{ nombre|format_number }}
                                                     </td>
                                                     <td class="text-end">
-                                                        {{ (nombre / page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].AT1erReg * 100)|format_number({fraction_digit: 1}) }}
+                                                        {{ (nombre / page.ameli.AT[ssclasseData.codeameli][dernieresDataAmeliAT].sommeCirconstances * 100)|format_number({fraction_digit: 1}) }}
                                                     </td>
                                                 </tr>
                                                 {% endif %}
@@ -179,12 +179,8 @@
                             </table>
                         </div>
                     </div>
-
-		
-
                 </li>
             </ul>
         </div>
-
 	</div>
 </div>

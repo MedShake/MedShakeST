@@ -69,6 +69,7 @@ class msAmeliAT
         SUM(risqueRoutier) as risqueRoutier,
         SUM(autresRisques) as autresRisques,
         SUM(autresVehiculesTransport) as autresVehiculesTransport,
+        (SUM(manutentionManuelle)+ SUM(chutesPlainPied) + SUM(outillageMain) + SUM(risqueMachine) + SUM(chutesHauteur) + SUM(agressions) + SUM(manutentionMecanique) + SUM(risquePhysiqueDontRisqueElec) + SUM(risqueChimique) + SUM(risqueRoutier) +  SUM(autresRisques) + SUM(autresVehiculesTransport)) as sommeCirconstances,
         (SUM(AT1erReg) / SUM(NbSalariesEnActiviteOuChoPar) * 1000) as indicateurIF,
         (SUM(AT1erReg) / SUM(nbHeuresTrav) * 1000000) as indicateurTF,
         (SUM(journeesIT) / SUM(nbHeuresTrav) * 1000) as indicateurTG,

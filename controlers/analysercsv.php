@@ -30,6 +30,7 @@ $template = "analysercsv";
 
 if(isset($match['params']['csv']) and !is_numeric($match['params']['csv'])) die;
 $file = $p['config']['stockageLocation'].'csv/'.$match['params']['csv'].'.csv';
+$p['page']['CSVid'] = $match['params']['csv'];
 
 $csvfile = new msCSV;
 
@@ -189,12 +190,5 @@ foreach ($NAFniveaux as $k => $v) {
 
     
 }
-
-
-
-
-// echo "<pre>";
-// print_r($p['page']['ameli']['AT']);
-// // print_r($NAFniveaux);
 
 unset($NAFniveaux, $totauxNAF, $sortedCSVdata, $restrictionCodesNAF, $ameliAT, $ameliMP, $ameliT, $csvfile, $naf, $file); 
