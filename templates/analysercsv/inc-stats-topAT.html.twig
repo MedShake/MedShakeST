@@ -1,0 +1,82 @@
+{#
+# This file is part of MedShakeST.
+#
+# Copyright (c) 2024
+# Bertrand Boutillier <b.boutillier@gmail.com>
+# http://www.medshake.net
+#
+# MedShakeST is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# MedShakeST is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with MedShakeST. If not, see <http://www.gnu.org/licenses/>.
+#/
+
+/##
+ # Template > include pour stats
+ #
+ # @author Bertrand Boutillier <b.boutillier@gmail.com>
+ #}
+
+<div class="card mt-3">
+	<div class="card-header fw-bold">Accidents du travail {{ dernieresDataAmeliAT }} concernant les domaines d'activités de vos entreprises</div>
+	<div class="card-body">
+        <ul class="nav nav-pills mb-3" id="top10-tab-salaries" role="tablist">
+            {% for indicateur, indicateurLabel in indicateursAT %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if loop.index == 1 %}active{% endif %}" id="top10-{{ indicateur }}-pill" data-bs-toggle="pill" data-bs-target="#top10-{{ indicateur }}-tab" type="button" role="tab" aria-controls="top10-{{ indicateur }}-tab" aria-selected="true">{{ indicateurLabel }}</button>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="tab-content" id="top10indicateursAT-tabContent">
+            {% for indicateur, indicateurLabel in indicateursAT %}
+				<div class="tab-pane fade {% if loop.index == 1 %}show active{% endif %}" id="top10-{{ indicateur }}-tab" role="tabpanel" aria-labelledby="top10-{{ indicateur }}-pill" tabindex="0">
+
+					<table class="table table-sm table-hover caption-top">
+                        {% if indicateur == 'indicateurIF' %}
+                            {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurIF < b.indicateurIF ) %}
+                            <caption class="text-end small">Indice de fréquence (IF) = (nb des accidents en premier règlement/effectif salarié) x 1 000</caption>
+                        {% elseif indicateur == 'indicateurTF' %}
+                            {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurTF < b.indicateurTF ) %}
+                            <caption class="text-end small">Taux de fréquence (TF) = (nb des accidents en premier règlement/heures travaillées) x 1 000 000</caption>
+                        {% elseif indicateur == 'indicateurTG' %}
+                            {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurTG < b.indicateurTG ) %}
+                            <caption class="text-end small">Taux de gravité (TG) = (nb des journées perdues par incapacité temporaire/heures travaillées) x 1 000</caption>
+                        {% elseif indicateur == 'indicateurIG' %}
+                            {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurIG < b.indicateurIG ) %}
+                            <caption class="text-end small">Indice de gravité (IG) = (somme des taux d’incapacité permanente/heures travaillées) x 1 000 000</caption>
+						{% endif %}
+
+                        <thead>
+                            <th>#</th>
+                            <th>{{ indicateurLabel }}</th>
+                            <th>Sous-classes NAF</th>
+                            {% if page.stats.CSV.totalSalaries > 0 %}<th class="text-end"><i class="fa-solid fa-user"></i></th>{% endif %}
+                            <th class="text-end"><i class="fa-solid fa-industry"></i></th>
+                        </thead>
+                        <tbody>
+                        {% for k,v in tabindicateur %}
+							<tr>
+                                <td>#{{ loop.index }}</td>
+                                <td>{{ v[indicateur]|format_number({fraction_digit: 2}) }}</td>
+								<td><a href="javascript:void(0)" class="nafredirector link-dark link-underline-opacity-25" data-sousclasse="{{ k|replace({'.': ''}) }}">{{ k }}</a> - {{ v.label }}</td>
+                                {% if page.stats.CSV.totalSalaries > 0 %}<td class="text-end">{{ v.nbSalaries|format_number }}</td>{% endif %}
+                                <td class="text-end"><a href="javascript:void(0)" class="nafredirector link-dark link-underline-opacity-25" data-sousclasse="{{ k|replace({'.': ''}) }}">{{ v.nbEntreprises|format_number }}</a></td>
+							</tr>
+						{% endfor %}
+                        </tbody>
+					</table>
+
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

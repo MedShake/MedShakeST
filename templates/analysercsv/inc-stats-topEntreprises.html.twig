@@ -1,0 +1,69 @@
+{#
+# This file is part of MedShakeST.
+#
+# Copyright (c) 2024
+# Bertrand Boutillier <b.boutillier@gmail.com>
+# http://www.medshake.net
+#
+# MedShakeST is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# MedShakeST is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with MedShakeST. If not, see <http://www.gnu.org/licenses/>.
+#/
+
+/##
+ # Template > include pour stats
+ #
+ # @author Bertrand Boutillier <b.boutillier@gmail.com>
+ #}
+
+
+<div class="card mt-3">
+	<div class="card-header fw-bold">Répartitions de vos entreprises dans la NAF</div>
+	<div class="card-body">
+
+		<ul class="nav nav-pills mb-3" id="top10-tab-entreprises" role="tablist">
+			{% for labelTop, labelTopDisplay in top10labels %}
+				<li class="nav-item" role="presentation">
+					<button class="nav-link {% if loop.last %}active{% endif %}" id="top10entreprises-{{ labelTop }}-pill" data-bs-toggle="pill" data-bs-target="#top10entreprises-{{ labelTop }}-tab" type="button" role="tab" aria-controls="top10entreprises-{{ labelTop }}-tab" aria-selected="true">{{ labelTopDisplay|capitalize }}s</button>
+				</li>
+			{% endfor %}
+		</ul>
+
+		<div class="tab-content" id="top10entreprise-tabContent">
+			{% for labelTop, labelTopDisplay in top10labels %}
+				<div class="tab-pane fade {% if loop.last %}show active{% endif %}" id="top10entreprises-{{ labelTop }}-tab" role="tabpanel" aria-labelledby="top10entreprises-{{ labelTop }}-pill" tabindex="0">
+					<table class="table table-sm table-hover">
+                        <thead>
+                            <th>#</th>
+                            <th><i class="fa-solid fa-industry"></i></th>
+                            <th><i class="fa-solid fa-industry"></i>%</th>
+                            {% if page.stats.CSV.totalSalaries > 0 %}<th><i class="fa-solid fa-user"></i></th>{% endif %}
+                            <th>{{ labelTopDisplay|capitalize }} NAF</th>
+                        </thead>
+                        <tbody>
+						{% for k,v in page.hierarchieNAF[labelTop ~ 's']|sort((a, b) => a.nbEntreprises < b.nbEntreprises) %}
+							<tr>
+                                <td>#{{ loop.index }}</td>
+								<td>{{ v.nbEntreprises|format_number }}</td>
+                                <td>{{ (v.nbEntreprises / page.stats.CSV.totalEntreprises * 100 )|format_number({fraction_digit: 1}) }}</td>
+                                {% if page.stats.CSV.totalSalaries > 0 %}<td>{{ v.nbSalaries|format_number }}</td>{% endif %}
+								<td><a href="javascript:void(0)" class="nafredirector link-dark link-underline-opacity-25" data-sousclasse="{{ k|replace({'.': ''}) }}">{{ k }}</a> - {{ v.label }}</td>
+							</tr>
+						{% endfor %}
+                        </tbody>
+					</table>
+				</div>
+			{% endfor %}
+		</div>
+
+	</div>
+</div>

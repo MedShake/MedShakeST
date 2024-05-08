@@ -1,7 +1,7 @@
 {#
 # This file is part of MedShakeST.
 #
-# Copyright (c) 2022
+# Copyright (c) 2024
 # Bertrand Boutillier <b.boutillier@gmail.com>
 # http://www.medshake.net
 #
@@ -25,149 +25,38 @@
  # @author Bertrand Boutillier <b.boutillier@gmail.com>
  #}
 
-
 {% set top10labels = {'section':'Section', 'division':'Division','groupe':'Groupe','classe':'Classe','sousclasse':'Sous-classe'} %}
 
-<div class="card mt-3">
-	<div class="card-header fw-bold"><i class="fa-solid fa-user text-secondary"></i> Top 10 Indicateurs AT {{ dernieresDataAmeliAT }}</div>
-	<div class="card-body">
-        <ul class="nav nav-pills mb-3" id="top10-tab-salaries" role="tablist">
-            {% for indicateur, indicateurLabel in indicateursAT %}
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link {% if loop.index == 1 %}active{% endif %}" id="top10-{{ indicateur }}-pill" data-bs-toggle="pill" data-bs-target="#top10-{{ indicateur }}-tab" type="button" role="tab" aria-controls="top10-{{ indicateur }}-tab" aria-selected="true">{{ indicateurLabel }}</button>
-                </li>
-            {% endfor %}
-        </ul>
 
-        <div class="tab-content" id="top10indicateursAT-tabContent">
-            {% for indicateur, indicateurLabel in indicateursAT %}
-				<div class="tab-pane fade {% if loop.index == 1 %}show active{% endif %}" id="top10-{{ indicateur }}-tab" role="tabpanel" aria-labelledby="top10-{{ indicateur }}-pill" tabindex="0">
-
-					<table class="table table-sm table-hover">
-                        {% if indicateur == 'indicateurIF' %}
-                            {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurIF < b.indicateurIF )|slice(0,10) %}
-                            <caption class="text-end small">Indice de fréquence (IF) = (nb des accidents en premier règlement/effectif salarié) x 1 000</caption>
-                        {% elseif indicateur == 'indicateurTF' %}
-                            {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurTF < b.indicateurTF )|slice(0,10) %}
-                            <caption class="text-end small">Taux de fréquence (TF) = (nb des accidents en premier règlement/heures travaillées) x 1 000 000</caption>
-                        {% elseif indicateur == 'indicateurTG' %}
-                            {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurTG < b.indicateurTG )|slice(0,10) %}
-                            <caption class="text-end small">Taux de gravité (TG) = (nb des journées perdues par incapacité temporaire/heures travaillées) x 1 000</caption>
-                        {% elseif indicateur == 'indicateurIG' %}
-                            {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurIG < b.indicateurIG )|slice(0,10) %}
-                            <caption class="text-end small">Indice de gravité (IG) = (somme des taux d’incapacité permanente/heures travaillées) x 1 000 000</caption>
-						{% endif %}
-
-                        <thead>
-                            <th>#</th>
-                            <th>{{ indicateurLabel }}</th>
-                            {% if page.stats.CSV.totalSalaries > 0 %}<th><i class="fa-solid fa-user"></i></th>{% endif %}
-                            <th><i class="fa-solid fa-industry"></i></th>
-                            <th>Sous-classes NAF</th>
-                        </thead>
-                        <tbody>
-                        {% for k,v in tabindicateur %}
-							<tr>
-                                <td>#{{ loop.index }}</td>
-                                <td>{{ v[indicateur]|format_number({fraction_digit: 2}) }}</td>
-								{% if page.stats.CSV.totalSalaries > 0 %}<td>{{ v.nbSalaries|format_number }}</td>{% endif %}
-                                <td>{{ v.nbEntreprises|format_number }}</td>
-								<td><a href="javascript:void(0)" class="nafredirector link-dark link-underline-opacity-25" data-sousclasse="{{ k|replace({'.': ''}) }}">{{ k }}</a> - {{ v.label }}</td>
-							</tr>
-						{% endfor %}
-                        </tbody>
-					</table>
-
-
-
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-
-{% if page.stats.CSV.totalSalaries > 0 %}
-    <div class="card mt-3">
-        <div class="card-header fw-bold"><i class="fa-solid fa-user text-secondary"></i> Top 10 NAF salariés</div>
-        <div class="card-body">
-
-            <ul class="nav nav-pills mb-3" id="top10-tab-salaries" role="tablist">
-                {% for labelTop, labelTopDisplay in top10labels %}
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link {% if loop.last %}active{% endif %}" id="top10salaries-{{ labelTop }}-pill" data-bs-toggle="pill" data-bs-target="#top10salaries-{{ labelTop }}-tab" type="button" role="tab" aria-controls="top10salaries-{{ labelTop }}-tab" aria-selected="true">{{ labelTopDisplay|capitalize }}s</button>
-                    </li>
-                {% endfor %}
-            </ul>
-
-            <div class="tab-content" id="top10salarie-tabContent">
-                {% for labelTop, labelTopDisplay in top10labels %}
-                    <div class="tab-pane fade {% if loop.last %}show active{% endif %}" id="top10salaries-{{ labelTop }}-tab" role="tabpanel" aria-labelledby="top10salaries-{{ labelTop }}-pill" tabindex="0">
-                        <table class="table table-sm table-hover">
-                            <thead>
-                                <th>#</th>
-                                <th><i class="fa-solid fa-user"></i></th>
-                                <th><i class="fa-solid fa-user"></i>%</th>
-                                <th><i class="fa-solid fa-industry"></i></th>
-                                <th>{{ labelTopDisplay|capitalize }} NAF</th>
-                            </thead>
-                            <tbody>
-                            {% for k,v in page.hierarchieNAF[labelTop ~ 's']|sort((a, b) => a.nbSalaries < b.nbSalaries)|slice(0,10) %}
-                                <tr>
-                                    <td>#{{ loop.index }}</td>
-                                    <td>{{ v.nbSalaries|format_number }}</td>
-                                    <td>{{ (v.nbSalaries / page.stats.CSV.totalSalaries * 100 )|format_number({fraction_digit: 1}) }}</td>
-                                    <td>{{ v.nbEntreprises|format_number }}</td>
-                                    <td><a href="javascript:void(0)" class="nafredirector link-dark link-underline-opacity-25" data-sousclasse="{{ k|replace({'.': ''}) }}">{{ k }}</a> - {{ v.label }}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% endfor %}
-            </div>
-
-        </div>
-    </div>
-{% endif %}
-
-<div class="card mt-3">
-	<div class="card-header fw-bold"><i class="fa-solid fa-industry text-secondary"></i> Top 10 NAF entreprises</div>
-	<div class="card-body">
-
-		<ul class="nav nav-pills mb-3" id="top10-tab-entreprises" role="tablist">
-			{% for labelTop, labelTopDisplay in top10labels %}
-				<li class="nav-item" role="presentation">
-					<button class="nav-link {% if loop.last %}active{% endif %}" id="top10entreprises-{{ labelTop }}-pill" data-bs-toggle="pill" data-bs-target="#top10entreprises-{{ labelTop }}-tab" type="button" role="tab" aria-controls="top10entreprises-{{ labelTop }}-tab" aria-selected="true">{{ labelTopDisplay|capitalize }}s</button>
-				</li>
-			{% endfor %}
-		</ul>
-
-		<div class="tab-content" id="top10entreprise-tabContent">
-			{% for labelTop, labelTopDisplay in top10labels %}
-				<div class="tab-pane fade {% if loop.last %}show active{% endif %}" id="top10entreprises-{{ labelTop }}-tab" role="tabpanel" aria-labelledby="top10entreprises-{{ labelTop }}-pill" tabindex="0">
-					<table class="table table-sm table-hover">
-                        <thead>
-                            <th>#</th>
-                            <th><i class="fa-solid fa-industry"></i></th>
-                            <th><i class="fa-solid fa-industry"></i>%</th>
-                            {% if page.stats.CSV.totalSalaries > 0 %}<th><i class="fa-solid fa-user"></i></th>{% endif %}
-                            <th>{{ labelTopDisplay|capitalize }} NAF</th>
-                        </thead>
-                        <tbody>
-						{% for k,v in page.hierarchieNAF[labelTop ~ 's']|sort((a, b) => a.nbEntreprises < b.nbEntreprises)|slice(0,10) %}
-							<tr>
-                                <td>#{{ loop.index }}</td>
-								<td>{{ v.nbEntreprises|format_number }}</td>
-                                <td>{{ (v.nbEntreprises / page.stats.CSV.totalEntreprises * 100 )|format_number({fraction_digit: 1}) }}</td>
-                                {% if page.stats.CSV.totalSalaries > 0 %}<td>{{ v.nbSalaries|format_number }}</td>{% endif %}
-								<td><a href="javascript:void(0)" class="nafredirector link-dark link-underline-opacity-25" data-sousclasse="{{ k|replace({'.': ''}) }}">{{ k }}</a> - {{ v.label }}</td>
-							</tr>
-						{% endfor %}
-                        </tbody>
-					</table>
-				</div>
-			{% endfor %}
+<ul class="nav nav-pills nav-justified mt-4 mb-4" id="pills-StatsTab" role="tablist">
+	<li class="nav-item" role="presentation">
+		<button class="nav-link active" id="pills-stats-entreprises-tab" data-bs-toggle="pill" data-bs-target="#pills-stats-entreprises" type="button" role="tab" aria-controls="pills-stats-entreprises" aria-selected="false"><i class="fa-solid fa-industry"></i> Entreprises</button>
+	</li>
+	{% if page.stats.CSV.totalSalaries > 0 %}
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="pills-stats-salaries-tab" data-bs-toggle="pill" data-bs-target="#pills-stats-salaries" type="button" role="tab" aria-controls="pills-stats-salaries" aria-selected="true"><i class="fa-solid fa-user"></i> Salariés</button>
+		</li>
+	{% endif %}
+	<li class="nav-item" role="presentation">
+		<button class="nav-link" id="pills-stats-MP-tab" data-bs-toggle="pill" data-bs-target="#pills-stats-MP" type="button" role="tab" aria-controls="pills-stats-MP" aria-selected="false"><i class="fa-solid fa-pills"></i> Maladie profesionnelles</button>
+	</li>
+	<li class="nav-item" role="presentation">
+		<button class="nav-link" id="pills-stats-AT-tab" data-bs-toggle="pill" data-bs-target="#pills-stats-AT" type="button" role="tab" aria-controls="pills-stats-AT" aria-selected="false"><i class="fa-solid fa-person-falling-burst"></i> Accidents du travail</button>
+	</li>
+</ul>
+<div class="tab-content" id="pills-StatsTabContent">
+	<div class="tab-pane fade show active" id="pills-stats-entreprises" role="tabpanel" aria-labelledby="pills-stats-entreprises-tab" tabindex="0">
+		{% include 'inc-stats-topEntreprises.html.twig' %}
+	</div>
+	{% if page.stats.CSV.totalSalaries > 0 %}
+		<div class="tab-pane fade" id="pills-stats-salaries" role="tabpanel" aria-labelledby="pills-stats-salaries-tab" tabindex="0">
+			{% include 'inc-stats-topSalaries.html.twig' %}
 		</div>
-
+	{% endif %}
+	<div class="tab-pane fade" id="pills-stats-MP" role="tabpanel" aria-labelledby="pills-stats-MP-tab" tabindex="0">
+		{% include 'inc-stats-topMP.html.twig' %}
+	</div>
+	<div class="tab-pane fade" id="pills-stats-AT" role="tabpanel" aria-labelledby="pills-stats-AT-tab" tabindex="0">
+		{% include 'inc-stats-topAT.html.twig' %}
 	</div>
 </div>

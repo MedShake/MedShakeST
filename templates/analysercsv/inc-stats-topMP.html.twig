@@ -1,0 +1,108 @@
+{#
+# This file is part of MedShakeST.
+#
+# Copyright (c) 2024
+# Bertrand Boutillier <b.boutillier@gmail.com>
+# http://www.medshake.net
+#
+# MedShakeST is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# MedShakeST is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with MedShakeST. If not, see <http://www.gnu.org/licenses/>.
+#/
+
+/##
+ # Template > include pour stats
+ #
+ # @author Bertrand Boutillier <b.boutillier@gmail.com>
+ #}
+
+<div class="card mt-3">
+	<div class="card-header fw-bold">Maladies professionnelles {{ dernieresDataAmeliAT }} par tableau concernant les domaines d'activités de vos entreprises</div>
+	<div class="card-body">
+        <ul class="nav nav-pills mb-3" id="top10-tab-mp" role="tablist">
+            {% for mp, data in page.ameli.MPstats[dernieresDataAmeliAT] %}
+                <li class="nav-item" role="presentation">
+                    <button title="{{ page.ameli.MPstats[dernieresDataAmeliAT][mp]['label'] }}" class="nav-link  {% if loop.index == 1 %}active{% endif %}" id="top10-{{ mp }}-pill" data-bs-toggle="pill" data-bs-target="#top10-{{ mp }}-tab" type="button" role="tab" aria-controls="top10-{{ mp }}-tab" aria-selected="true">
+                     {{ page.ameli.MPstats[dernieresDataAmeliAT][mp]['tabMP'] }}
+                    </button>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="tab-content" id="top10indicateursMP-tabContent">
+        {% for mp, data in page.ameli.MPstats[dernieresDataAmeliAT] %}
+            <div class="tab-pane fade {% if loop.index == 1 %}show active{% endif %}" id="top10-{{ mp }}-tab" role="tabpanel" aria-labelledby="top10-{{ mp }}-pill" tabindex="0">
+                <p class="lead"><a class="me-2 link-secondary" title="Voir le tableau sur le site de l'INRS" href="https://www.inrs.fr/publications/bdd/mp/tableau.html?refINRS=RG%20{{ data['tabMP']|replace({'B': '%20BIS', 'T': '%20TER'}) }}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>Tableau {{ data['tabMP'] }} : {{ data['label'] }}
+                
+                </p>
+
+                <table class="table table-sm table-hover">
+                    <caption class="text-end small">Taux d'incidence = nb de cas dans le secteur x 100 000 / nb de salariés du secteur</caption>
+                        <thead>
+                            <th>#</th>
+                            <th>Cas déclarés</th>
+                            <th><i class="fa-solid fa-user"></i> du secteur</th>
+                            <th>Taux d'incidence</th>
+                            <th>Sous-classes NAF</th>
+                            {% if page.stats.CSV.totalSalaries > 0 %}<th class="text-end"><i class="fa-solid fa-user"></i></th>{% endif %}
+                            <th class="text-end"><i class="fa-solid fa-industry"></i></th>
+                        </thead>
+                        <tbody>
+                        {% for k,v in data['NAF'] %}
+							<tr>
+                                <td>#{{ loop.index }}</td>
+                                <td>{{ v.nb|format_number }}</td>
+                                <td>{{ v.NbSalariesEnActiviteOuChoPar|format_number }}</td>
+                                <td>{{ v['TxIncidence']|format_number({fraction_digit: 1}) }}</td>
+								<td><a href="javascript:void(0)" class="nafredirector link-dark link-underline-opacity-25" data-sousclasse="{{ k|replace({'.': ''}) }}">{{ v.codeameli }}</a> - {{ v.labelNAF }}</td>
+                                {% if page.stats.CSV.totalSalaries > 0 %}<td class="text-end">{{ v.nbSalaries|format_number }}</td>{% endif %}
+                                <td class="text-end"><a href="javascript:void(0)" class="nafredirector link-dark link-underline-opacity-25" data-sousclasse="{{ k|replace({'.': ''}) }}">{{ v.nbEntreprises|format_number }}</a></td>
+							</tr>
+						{% endfor %}
+                        </tbody>
+                </table>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+	<div class="card-header fw-bold">Récapitulatif des tableaux de maladies professionnelles concernant les domaines d'activités de vos entreprises sur la base des déclarations {{ dernieresDataAmeliAT }}</div>
+	<div class="card-body">
+		<table class="table table-sm table-hover">
+			<thead>
+				<th colspan="2">Tableau</th>
+				<th class="text-end">
+					<i class="fa-solid fa-user"></i></th>
+				</th>
+				<th class="text-end">
+					<i class="fa-solid fa-industry"></i></th>
+				</th>
+                <th></th>
+			</thead>
+			<tbody>
+				{% for mp, data in page.ameli.MPstats[dernieresDataAmeliAT] %}
+                			<tr>
+                                
+                                <td class="text-end">{{ data['tabMP'] }}</td>
+                                <td class="small">{{ data['label'] }}</td>
+                                <td class="text-end">{{ data.totalSalaries|format_number }}</td>
+                                <td class="text-end">{{ data.totalEntreprises|format_number }}</td>
+                                <td><a class="ms-2 link-secondary" title="Voir le tableau {{ data['tabMP'] }} sur le site de l'INRS" href="https://www.inrs.fr/publications/bdd/mp/tableau.html?refINRS=RG%20{{ data['tabMP']|replace({'B': '%20BIS', 'T': '%20TER'}) }}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
+                            </tr>
+                
+                {% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>

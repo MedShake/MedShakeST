@@ -59,7 +59,10 @@ $p['page']['NAFniveaux'] = $NAFniveaux;
 $ameliAT = new msAmeliAT;
 $p['page']['ameli']['AT'] = $ameliAT->getAmeliATdataByNAF($restrictionCodesNAF);
 $ameliMP = new msAmeliMP;
-$p['page']['ameli']['MP'] = $ameliMP->getAmeliMPdataByNAF($restrictionCodesNAF);
+$ameliMPdatas = $ameliMP->getAmeliMPdataByNAF($restrictionCodesNAF);
+$p['page']['ameli']['MP'] = $ameliMPdatas [0];
+$p['page']['ameli']['MPstats'] = $ameliMPdatas [1];
+
 $ameliT = new msAmeliT;
 $p['page']['ameli']['T'] = $ameliT->getAmeliTdataByNAF($restrictionCodesNAF);
 
@@ -186,9 +189,11 @@ foreach ($NAFniveaux as $k => $v) {
             'indicateurIG' => $p['page']['ameli']['AT'][$codeameli][$p['config']['dernieresDataAmeliAT']]['indicateurIG']
         );
     }
-
-
     
 }
+
+
+// Calcul des incidences pour les MP et ajouts des datas nécessaires à l'onglet stats > MP
+$ameliMP->getAmeliMPstatsDatas($p['page']['ameli']['MPstats'], $p['page']['hierarchieNAF']['sousclasses'],$p['page']['ameli']['AT']);
 
 unset($NAFniveaux, $totauxNAF, $sortedCSVdata, $restrictionCodesNAF, $ameliAT, $ameliMP, $ameliT, $csvfile, $naf, $file); 
