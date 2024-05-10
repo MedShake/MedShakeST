@@ -85,8 +85,8 @@
 		<table id="topMP" class="table table-sm table-hover">
 			<thead>
 				<th colspan="2">Tableau</th>
-				<th class="text-end"><i class="fa-solid fa-user"></i></th>
-				<th class="text-end"><i class="fa-solid fa-industry"></i><p class="d-none">Salariés</p></th>
+				{% if page.stats.CSV.totalSalaries > 0 %}<th class="text-end"><i class="fa-solid fa-user"></i></th>{% endif %}
+				<th class="text-end"><i class="fa-solid fa-industry"></i>{% if page.stats.CSV.totalSalaries > 0 %}<p class="d-none">Salariés</p>{% endif %}</th>
                 <th><p class="d-none">Entreprises</p></th>
                 {# Hack pour l'export CSV qui ne supporte pas le colspan : les textes en display none sont bien situés #}
 			</thead>
@@ -96,7 +96,7 @@
                                 
                                 <td class="text-end">{{ data['tabMP'] }}</td>
                                 <td class="small">{{ data['label'] }}</td>
-                                <td class="text-end">{{ data.totalSalaries|format_number }}</td>
+                                {% if page.stats.CSV.totalSalaries > 0 %}<td class="text-end">{{ data.totalSalaries|format_number }}</td>{% endif %}
                                 <td class="text-end">{{ data.totalEntreprises|format_number }}</td>
                                 <td><a class="ms-2 link-secondary" title="Voir le tableau {{ data['tabMP'] }} sur le site de l'INRS" href="https://www.inrs.fr/publications/bdd/mp/tableau.html?refINRS=RG%20{{ data['tabMP']|replace({'B': '%20BIS', 'T': '%20TER'}) }}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></td>
                             </tr>
