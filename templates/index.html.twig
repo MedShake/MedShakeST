@@ -23,7 +23,6 @@
  # Template > sommaire du site
  #
  # @author Bertrand Boutillier <b.boutillier@gmail.com>
- # @contrib fr33z00 <https://github.com/fr33z00>
  #}
 
 {% extends "page.html.twig" %}
@@ -33,24 +32,55 @@
 
 {% block jsEmbed %}
 	{{ parent() }}
-	randomNumber = Math.floor(Math.random() * 100000000000);
-    $(document).ready(function() {
-        $("#dropZoneDoc").dmUploader({
-            url: urlBase+'/ajax/uploadCSV/',
-            extraData: {
-                randomNumber: randomNumber
-            },
-            dataType: 'html',
-            allowedTypes: "text/csv",
-            maxFiles: 1,
-            onUploadSuccess: function(id, data) {
-                $(".progress-bar").css('width', '0%');
-                window.location.href = urlBase + '/analyser/csv/' + randomNumber + '/';
-            },
-            onUploadProgress: function(id, percent) {
-                $(".progress-bar").css('width', percent + '%');
-            }
+    let randomNumber = Math.floor(Math.random() * 100000000000);
+
+    document.addEventListener("DOMContentLoaded", function() {
+        let dropZoneDoc = document.getElementById("dropZoneDoc");
+
+        dropZoneDoc.addEventListener("drop", function(event) {
+            event.preventDefault(); 
+            let files = event.dataTransfer.files;
+            handleFiles(files);
         });
+
+        dropZoneDoc.addEventListener("dragover", function(event) {
+            event.preventDefault();
+        });
+
+        dropZoneDoc.addEventListener("change", function(event) {
+            let files = event.target.files;
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            if (files.length == 1) {
+                let file = files[0];
+                if (file.type === "text/csv") {
+                    let xhr = new XMLHttpRequest();
+                    xhr.open("POST", urlBase + "/ajax/uploadCSV/", true);
+                    xhr.upload.onprogress = function(event) {
+                        if (event.lengthComputable) {
+                            let percentComplete = (event.loaded / event.total) * 100;
+                            document.querySelector(".progress-bar").style.width = percentComplete + "%";
+                        }
+                    };
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            document.querySelector(".progress-bar").style.width = "0%";
+                            window.location.href = urlBase + "/analyser/csv/" + randomNumber + "/";
+                        }
+                    };
+                    let formData = new FormData();
+                    formData.append("file", file);
+                    formData.append("randomNumber", randomNumber);
+                    xhr.send(formData);
+                } else {
+                    alert("Seuls les fichiers CSV sont autorisés.");
+                }
+            } else {
+                    alert("Un seul fichier à la fois autorisé.");
+            }
+        }
     });
 {% endblock %}
 
