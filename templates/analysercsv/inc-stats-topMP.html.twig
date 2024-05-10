@@ -42,19 +42,20 @@
         {% for mp, data in page.ameli.MPstats[dernieresDataAmeliAT] %}
             <div class="tab-pane fade {% if loop.index == 1 %}show active{% endif %}" id="top10-{{ mp }}-tab" role="tabpanel" aria-labelledby="top10-{{ mp }}-pill" tabindex="0">
                 <p class="lead"><a class="me-2 link-secondary" title="Voir le tableau sur le site de l'INRS" href="https://www.inrs.fr/publications/bdd/mp/tableau.html?refINRS=RG%20{{ data['tabMP']|replace({'B': '%20BIS', 'T': '%20TER'}) }}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>Tableau {{ data['tabMP'] }} : {{ data['label'] }}
-                
                 </p>
 
-                <table class="table table-sm table-hover">
+                <button class="btn btn-sm btn-secondary btn-sm float-end" style="margin-top: -3em;" onclick="exportTableToCSV('#mp-tab{{ data['tabMP'] }}','mp{{ dernieresDataAmeliAT }}-tab{{ data['tabMP'] }}.csv')"><i class="fa-solid fa-file-export"></i> CSV</button>
+
+                <table id="mp-tab{{ data['tabMP'] }}" class="table table-sm table-hover">
                     <caption class="text-end small">Taux d'incidence = nb de cas dans le secteur x 100 000 / nb de salariés du secteur</caption>
                         <thead>
                             <th>#</th>
                             <th>Cas déclarés</th>
-                            <th><i class="fa-solid fa-user"></i> du secteur</th>
+                            <th><i class="fa-solid fa-user"></i><p class="d-none">Salariés</p> du secteur</th>
                             <th>Taux d'incidence</th>
                             <th>Sous-classes NAF</th>
-                            {% if page.stats.CSV.totalSalaries > 0 %}<th class="text-end"><i class="fa-solid fa-user"></i></th>{% endif %}
-                            <th class="text-end"><i class="fa-solid fa-industry"></i></th>
+                            {% if page.stats.CSV.totalSalaries > 0 %}<th class="text-end"><i class="fa-solid fa-user"></i><p class="d-none">Salariés</p></th>{% endif %}
+                            <th class="text-end"><i class="fa-solid fa-industry"></i><p class="d-none">Entreprises</p></th>
                         </thead>
                         <tbody>
                         {% for k,v in data['NAF'] %}
@@ -77,18 +78,17 @@
 </div>
 
 <div class="card mt-3">
-	<div class="card-header fw-bold">Récapitulatif des tableaux de maladies professionnelles concernant les domaines d'activités de vos entreprises sur la base des déclarations {{ dernieresDataAmeliAT }}</div>
+	<div class="card-header fw-bold">Récapitulatif des tableaux de maladies professionnelles concernant les domaines d'activités de vos entreprises sur la base des déclarations {{ dernieresDataAmeliAT }}
+    <button class="btn btn-sm btn-secondary btn-sm float-end" onclick="exportTableToCSV('#topMP','mp{{ dernieresDataAmeliAT }}.csv')"><i class="fa-solid fa-file-export"></i> CSV</button>
+    </div>
 	<div class="card-body">
-		<table class="table table-sm table-hover">
+		<table id="topMP" class="table table-sm table-hover">
 			<thead>
 				<th colspan="2">Tableau</th>
-				<th class="text-end">
-					<i class="fa-solid fa-user"></i></th>
-				</th>
-				<th class="text-end">
-					<i class="fa-solid fa-industry"></i></th>
-				</th>
-                <th></th>
+				<th class="text-end"><i class="fa-solid fa-user"></i></th>
+				<th class="text-end"><i class="fa-solid fa-industry"></i><p class="d-none">Salariés</p></th>
+                <th><p class="d-none">Entreprises</p></th>
+                {# Hack pour l'export CSV qui ne supporte pas le colspan : les textes en display none sont bien situés #}
 			</thead>
 			<tbody>
 				{% for mp, data in page.ameli.MPstats[dernieresDataAmeliAT] %}

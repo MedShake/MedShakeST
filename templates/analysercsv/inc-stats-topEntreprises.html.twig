@@ -41,12 +41,15 @@
 		<div class="tab-content" id="top10entreprise-tabContent">
 			{% for labelTop, labelTopDisplay in top10labels %}
 				<div class="tab-pane fade {% if loop.last %}show active{% endif %}" id="top10entreprises-{{ labelTop }}-tab" role="tabpanel" aria-labelledby="top10entreprises-{{ labelTop }}-pill" tabindex="0">
-					<table class="table table-sm table-hover">
+
+                    <button class="btn btn-sm btn-secondary btn-sm float-end" style="margin-bottom: -2em;" onclick="exportTableToCSV('#tabTopEntreprises{{ labelTopDisplay|capitalize }}','entreprises-{{ labelTopDisplay }} NAF.csv')"><i class="fa-solid fa-file-export"></i> CSV</button>
+
+					<table id="tabTopEntreprises{{ labelTopDisplay|capitalize }}" class="table table-sm table-hover">
                         <thead>
                             <th>#</th>
-                            <th><i class="fa-solid fa-industry"></i></th>
-                            <th><i class="fa-solid fa-industry"></i>%</th>
-                            {% if page.stats.CSV.totalSalaries > 0 %}<th><i class="fa-solid fa-user"></i></th>{% endif %}
+                            <th><i class="fa-solid fa-industry"></i><p class="d-none">Entreprises</p></th>
+                            <th><i class="fa-solid fa-industry"></i>%<p class="d-none"> Entreprises</p></th>
+                            {% if page.stats.CSV.totalSalaries > 0 %}<th><i class="fa-solid fa-user"></i><p class="d-none">Salariés</p></th>{% endif %}
                             <th>{{ labelTopDisplay|capitalize }} NAF</th>
                         </thead>
                         <tbody>

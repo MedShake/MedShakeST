@@ -40,27 +40,29 @@
             {% for indicateur, indicateurLabel in indicateursAT %}
 				<div class="tab-pane fade {% if loop.index == 1 %}show active{% endif %}" id="top10-{{ indicateur }}-tab" role="tabpanel" aria-labelledby="top10-{{ indicateur }}-pill" tabindex="0">
 
-					<table class="table table-sm table-hover caption-top">
+                    <button class="btn btn-sm btn-secondary btn-sm float-end" style="margin-bottom: -3em;" onclick="exportTableToCSV('#at{{ dernieresDataAmeliAT }}{{ indicateur }}','at{{ dernieresDataAmeliAT }}-{{ indicateur }}.csv')"><i class="fa-solid fa-file-export"></i> CSV</button>
+
+					<table id="at{{ dernieresDataAmeliAT }}{{ indicateur }}" class="table table-sm table-hover caption-top">
                         {% if indicateur == 'indicateurIF' %}
                             {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurIF < b.indicateurIF ) %}
-                            <caption class="text-end small">Indice de fréquence (IF) = (nb des accidents en premier règlement/effectif salarié) x 1 000</caption>
+                            <caption class="small">Indice de fréquence (IF) = (nb des accidents en premier règlement/effectif salarié) x 1 000</caption>
                         {% elseif indicateur == 'indicateurTF' %}
                             {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurTF < b.indicateurTF ) %}
-                            <caption class="text-end small">Taux de fréquence (TF) = (nb des accidents en premier règlement/heures travaillées) x 1 000 000</caption>
+                            <caption class="small">Taux de fréquence (TF) = (nb des accidents en premier règlement/heures travaillées) x 1 000 000</caption>
                         {% elseif indicateur == 'indicateurTG' %}
                             {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurTG < b.indicateurTG ) %}
-                            <caption class="text-end small">Taux de gravité (TG) = (nb des journées perdues par incapacité temporaire/heures travaillées) x 1 000</caption>
+                            <caption class="small">Taux de gravité (TG) = (nb des journées perdues par incapacité temporaire/heures travaillées) x 1 000</caption>
                         {% elseif indicateur == 'indicateurIG' %}
                             {% set tabindicateur = page.hierarchieNAF.sousclasses|sort((a, b) => a.indicateurIG < b.indicateurIG ) %}
-                            <caption class="text-end small">Indice de gravité (IG) = (somme des taux d’incapacité permanente/heures travaillées) x 1 000 000</caption>
+                            <caption class="small">Indice de gravité (IG) = (somme des taux d’incapacité permanente/heures travaillées) x 1 000 000</caption>
 						{% endif %}
 
                         <thead>
                             <th>#</th>
                             <th>{{ indicateurLabel }}</th>
                             <th>Sous-classes NAF</th>
-                            {% if page.stats.CSV.totalSalaries > 0 %}<th class="text-end"><i class="fa-solid fa-user"></i></th>{% endif %}
-                            <th class="text-end"><i class="fa-solid fa-industry"></i></th>
+                            {% if page.stats.CSV.totalSalaries > 0 %}<th class="text-end"><i class="fa-solid fa-user"></i><p class="d-none">Salariés</p></th>{% endif %}
+                            <th class="text-end"><i class="fa-solid fa-industry"></i><p class="d-none">Entreprises</p></th>
                         </thead>
                         <tbody>
                         {% for k,v in tabindicateur %}
