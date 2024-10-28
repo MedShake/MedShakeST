@@ -1,0 +1,13 @@
+protocol: http://
+host: ""
+urlHostSuffixe: ""
+webDirectory: /var/www/public_html/
+stockageLocation: /var/www/stockage/
+templatesFolder: /var/www/templates/
+twigEnvironnementCache: false
+twigEnvironnementAutoescape: false
+twigDebug: false
+
+dernieresDataAmeliAT: 2021
+dernieresDataAmeliMP: 2021
+dernieresDataAmeliT: 2021

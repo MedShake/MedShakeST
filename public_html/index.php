@@ -51,9 +51,9 @@ $p['config']=yaml_parse_file($homepath.'config/config.yml');
 $pdo=msSQL::sqlConnect();
 
 /////////// correction pour host non présent (IP qui change)
-if ($p['config']['host']=='') {
-    $p['config']['host']=$_SERVER['SERVER_ADDR'];
-    $p['config']['cookieDomain']=$_SERVER['SERVER_ADDR'];
+if (empty($p['config']['host'])) {
+    $p['config']['host']=$_SERVER['HTTP_HOST'];
+    $p['config']['cookieDomain']=$_SERVER['HTTP_HOST'];
 }
 $p['homepath']=$homepath;
 
