@@ -54,23 +54,6 @@ class msTools
     }
 
     /**
-     * Encoder UTF8 un array multidimensionnel
-     * @param  array $array le tableau
-     * @return array        le tableau encodé UTF8
-     */
-    public static function utf8_converter($array)
-    {
-        if (is_array($array)) {
-            array_walk_recursive($array, function (&$item, $key) {
-                if (!mb_detect_encoding($item, 'UTF-8', true)) {
-                    $item = mb_convert_encoding($item, 'UTF-8', mb_detect_encoding($item, null, false));
-                }
-            });
-        }
-        return $array;
-    }
-
-    /**
      * Convertir un ficher texte iso en UTF8 sur lui même ou vers un autre fichier
      * @param  string $source      fichier source
      * @param  string $destination fichier destination
