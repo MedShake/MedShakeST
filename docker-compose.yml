@@ -22,5 +22,4 @@ services:
     volumes:
       - ./data_sql:/docker-entrypoint-initdb.d/
 
-volumes:
-  db_data:
+
